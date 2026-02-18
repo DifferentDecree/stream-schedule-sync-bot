@@ -15,4 +15,4 @@ class Config:
     TWITCH_BROADCASTER_ID = os.getenv("TWITCH_BROADCASTER_ID")
 
     EMBED_COLOR = int(os.getenv("EMBED_COLOR", "5814783"))
-    TIMEZONE = os.getenv("TIMEZONE", "America/New_York")
+    TIMEZONE = os.getenv("TIME_ZONE", "America/New_York")
