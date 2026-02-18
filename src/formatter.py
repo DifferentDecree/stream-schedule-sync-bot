@@ -28,7 +28,7 @@ class ScheduleFormatter:
         for i, day in enumerate(days):
             x0 = i * cell_width
             draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-            w, h = draw.textsize(day, font=font)
+            w, h = draw.getsize(day)
             draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
 
         #Draw events
