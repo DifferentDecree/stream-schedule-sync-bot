@@ -25,11 +25,11 @@ class ScheduleFormatter:
         week = self._prepare_data(data)
 
         #Draw headers
-         for i, day in enumerate(days):
-            x0 = i * cell_width
-            draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-            w, h = draw.textsize(day, font=font)
-            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
+        for i, day in enumerate(days):
+        x0 = i * cell_width
+        draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
+        w, h = draw.textsize(day, font=font)
+        draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
 
         #Draw events
         for i, day_events in enumerate(week):
@@ -57,7 +57,7 @@ class ScheduleFormatter:
 
             if not (today <= start <= end_week):
                 continue
-                
+
             weekday = start.weekday()
             week[weekday].append({"title": segment["title"], "is_canceled": segment.get("is_canceled", False)})
 
