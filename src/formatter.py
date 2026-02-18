@@ -14,7 +14,7 @@ class ScheduleFormatter:
         cell_height = 80
         header_height = 60
         padding = 10
-        font = ImageFont.truetype("arial.ttf", 16)
+        font = ImageFont.load_default()
 
         # Prepare week data
         week = self._prepare_data(data)
