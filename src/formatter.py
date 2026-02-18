@@ -3,6 +3,7 @@ import pytz
 
 class ScheduleFormatter:
     def __init__ (self, timezone):
+        print(timezone)
         self.tz = pytz.timezone(timezone)
 
     def format_horizontal_grid(self, data):
