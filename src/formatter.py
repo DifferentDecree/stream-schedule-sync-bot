@@ -12,16 +12,25 @@ class ScheduleFormatter:
 
         #Build per-day lists
         week = {i: [] for i in range(7)}
-        for segment in data["data"]["segments"]:
+        for segment in data.get("data", {}).get("segments", [])
+            start_time_str = segment.get("start_time")
+            title = segment.get("title", "Untitled")
+            is_canceled = segment.get("is_canceled", False)
+
+            if not start_time_str:
+                continue
+            
             start = datetime.datetime.fromisoformat(
-                segment["start_time"].replace("Z", "+00:00")
+                start_time_str.replace("Z", "+00:00")
             ).astimezone(self.tz)
+
             if not (today <= start <= end_week):
                 continue
+            
             weekday = start.weekday()
             time_str = start.strftime("%I:%M %p").lstrip("0")
-            entry = f"{time_str} {segment['title']}"
-            if segment["is_canceled"]:
+            entry = f"{time_str} {title}"
+            if is_canceled:
                 entry = f"~~{entry}~~"
             week[weekday].append(entry)
 
@@ -42,4 +51,4 @@ class ScheduleFormatter:
                 row.append(f"{events[i]:12}" if i < len(events) else " " * 12)
             lines.append(" | ".join(row))
 
-    return "```text\n" + "\n".join(lines) + "\n```"
+        return "```text\n" + "\n".join(lines) + "\n```"
