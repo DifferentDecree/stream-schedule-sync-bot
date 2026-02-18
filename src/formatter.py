@@ -10,10 +10,13 @@ class ScheduleFormatter:
         days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
         # Image settings
-        cell_width = 200
-        cell_height = 100
-        header_height = 50
+        cell_width = 250
+        cell_height = 80
+        header_height = 60
         padding = 10
+        font = ImageFont.truetype("arial.ttf", 16)
+
+        # Prepare week data
         week = self._prepare_data(data)
         max_rows = max(len(day) for day in week) or 1
         width = cell_width * 7
@@ -21,41 +24,39 @@ class ScheduleFormatter:
 
         img = Image.new("RGB", (width, height), color=(30, 30, 30))
         draw = ImageDraw.Draw(img)
-        font = ImageFont.load_default()  # can replace with ImageFont.truetype("arial.ttf", 14)
 
-        # Draw headers
-        # Draw headers
+        # Draw headers and vertical lines
         for i, day in enumerate(days):
             x0 = i * cell_width
             draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-
-            # Modern Pillow: use getbbox
             bbox = font.getbbox(day)
             w = bbox[2] - bbox[0]
             h = bbox[3] - bbox[1]
-
-            draw.text(
-                (x0 + (cell_width - w)//2, (header_height - h)//2),
-                day, fill="white", font=font
-            )
-
+            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
+            draw.line([(x0, 0), (x0, height)], fill=(100, 100, 100), width=2)
+        draw.line([(width-1, 0), (width-1, height)], fill=(100, 100, 100), width=2)
+        draw.line([(0, header_height), (width, header_height)], fill=(100, 100, 100), width=2)
 
         # Draw events
-        for i, day_events in enumerate(week):
-            x0 = i * cell_width
-            for j, event in enumerate(day_events):
-                y0 = header_height + j * cell_height
+        for col, day_events in enumerate(week):
+            x0 = col * cell_width
+            for row, event in enumerate(day_events):
+                y0 = header_height + row * cell_height
                 draw.rectangle([x0, y0, x0 + cell_width, y0 + cell_height], outline=(100, 100, 100))
                 text = event["title"]
                 if event["is_canceled"]:
                     text += " (Canceled)"
                 draw.text((x0 + padding, y0 + padding), text, fill="white", font=font)
 
+        # Save image
         img.save(filename)
         return filename
 
     def _prepare_data(self, data):
-        """Organize events per weekday"""
+        """
+        Organize events per weekday, include formatted time.
+        Returns: list of 7 lists (Mon-Sun), each containing dicts with title and is_canceled
+        """
         week = [[] for _ in range(7)]
         today = datetime.datetime.now(self.tz)
         end_week = today + datetime.timedelta(days=7)
@@ -69,8 +70,10 @@ class ScheduleFormatter:
                 continue
 
             weekday = start.weekday()
+            time_str = start.strftime("%I:%M %p").lstrip("0")
+            title = f"{time_str} {segment['title']}"
             week[weekday].append({
-                "title": segment["title"],
+                "title": title,
                 "is_canceled": segment.get("is_canceled", False)
             })
 
