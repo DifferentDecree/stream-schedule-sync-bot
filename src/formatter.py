@@ -15,7 +15,7 @@ class ScheduleFormatter:
         header_height = 50
         padding = 10
         width = cell_width * 7
-        max_rows = max(len(day) for day in self._prepare_data(data)) or 1
+        max_rows = max(len(day) for day in week) or 1
         height = header_height + (cell_height * max_rows)
 
         img = Image.new("RGB", (width, height), color=(30, 30, 30))
