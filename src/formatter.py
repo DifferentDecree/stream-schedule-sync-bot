@@ -10,10 +10,10 @@ class ScheduleFormatter:
         days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
         # Image settings
-        cell_width = 250
-        cell_height = 80
-        header_height = 60
-        padding = 10
+        cell_width = 300
+        cell_height = 120
+        header_height = 80
+        padding = 15
         font = ImageFont.load_default()
 
         # Prepare week data
@@ -71,7 +71,8 @@ class ScheduleFormatter:
 
             weekday = start.weekday()
             time_str = start.strftime("%I:%M %p").lstrip("0")
-            title = f"{time_str} {segment['title']}"
+            tz_str = start.tzname()
+            title = f"{time_str} {tz_str} {segment['title']}"
             week[weekday].append({
                 "title": title,
                 "is_canceled": segment.get("is_canceled", False)
