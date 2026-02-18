@@ -24,14 +24,21 @@ class ScheduleFormatter:
         font = ImageFont.load_default()  # can replace with ImageFont.truetype("arial.ttf", 14)
 
         # Draw headers
+        # Draw headers
         for i, day in enumerate(days):
             x0 = i * cell_width
             draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
 
-            # Use font.getsize instead of draw.textsize
-            w, h = font.getsize(day)
-            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2),
-                      day, fill="white", font=font)
+            # Modern Pillow: use getbbox
+            bbox = font.getbbox(day)
+            w = bbox[2] - bbox[0]
+            h = bbox[3] - bbox[1]
+
+            draw.text(
+                (x0 + (cell_width - w)//2, (header_height - h)//2),
+                day, fill="white", font=font
+            )
+
 
         # Draw events
         for i, day_events in enumerate(week):
