@@ -26,10 +26,10 @@ class ScheduleFormatter:
 
         #Draw headers
         for i, day in enumerate(days):
-        x0 = i * cell_width
-        draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-        w, h = draw.textsize(day, font=font)
-        draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
+            x0 = i * cell_width
+            draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
+            w, h = draw.textsize(day, font=font)
+            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
 
         #Draw events
         for i, day_events in enumerate(week):
