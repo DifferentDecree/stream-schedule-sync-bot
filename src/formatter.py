@@ -9,38 +9,41 @@ class ScheduleFormatter:
     def format_image(self, data, filename="calendar.png"):
         days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-        #Image settings
+        # Image settings
         cell_width = 200
         cell_height = 100
         header_height = 50
         padding = 10
-        width = cell_width * 7
+        week = self._prepare_data(data)
         max_rows = max(len(day) for day in week) or 1
+        width = cell_width * 7
         height = header_height + (cell_height * max_rows)
 
         img = Image.new("RGB", (width, height), color=(30, 30, 30))
         draw = ImageDraw.Draw(img)
-        font = ImageFont.load_default()
+        font = ImageFont.load_default()  # can replace with ImageFont.truetype("arial.ttf", 14)
 
-        week = self._prepare_data(data)
-
-        #Draw headers
+        # Draw headers
         for i, day in enumerate(days):
             x0 = i * cell_width
             draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-            w, h = draw.getsize(day)
-            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
 
-        #Draw events
+            # Use font.getsize instead of draw.textsize
+            w, h = font.getsize(day)
+            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2),
+                      day, fill="white", font=font)
+
+        # Draw events
         for i, day_events in enumerate(week):
             x0 = i * cell_width
             for j, event in enumerate(day_events):
                 y0 = header_height + j * cell_height
-                draw.rectangle([x0, y0, x0 + cell_width, y0 + cell_height], outline=(100,100,100))
+                draw.rectangle([x0, y0, x0 + cell_width, y0 + cell_height], outline=(100, 100, 100))
                 text = event["title"]
                 if event["is_canceled"]:
                     text += " (Canceled)"
                 draw.text((x0 + padding, y0 + padding), text, fill="white", font=font)
+
         img.save(filename)
         return filename
 
@@ -59,6 +62,9 @@ class ScheduleFormatter:
                 continue
 
             weekday = start.weekday()
-            week[weekday].append({"title": segment["title"], "is_canceled": segment.get("is_canceled", False)})
+            week[weekday].append({
+                "title": segment["title"],
+                "is_canceled": segment.get("is_canceled", False)
+            })
 
         return week
