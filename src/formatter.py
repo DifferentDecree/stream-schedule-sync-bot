@@ -1,10 +1,20 @@
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 import pytz
+import os 
 
 class ScheduleFormatter:
     def __init__(self, timezone="UTC"):
         self.tz = pytz.timezone(timezone)
+
+        base_path = os.path.join(os.path.dirname(__file__), "assets", "fonts")
+        self.header_font_path = os.path.join(base_path, "Roboto-Bold.ttf")
+        self.event_font_path = os.path.join(base_path, "Roboto-Regular.ttf")
+
+        if not os.path.exists(self.header_font_path):
+            self.header_font_path = None
+        if not os.path.exists(self.event_font_path):
+            self.event_font_path = None
 
     def format_image(self, data, filename="calendar.png"):
         days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -14,7 +24,6 @@ class ScheduleFormatter:
         cell_height = 120
         header_height = 80
         padding = 15
-        font = ImageFont.load_default()
 
         # Prepare week data
         week = self._prepare_data(data)
@@ -25,14 +34,22 @@ class ScheduleFormatter:
         img = Image.new("RGB", (width, height), color=(30, 30, 30))
         draw = ImageDraw.Draw(img)
 
+        # Load fonts
+        try:
+            header_font = ImageFont.truetype(self.header_font_path, 28) if self.header_font_path else ImageFont.load_default()
+            event_font = ImageFont.truetype(self.event_font_path, 22) if self.event_font_path else ImageFont.load_default()
+        except OSError:
+            header_font = ImageFont.load_default()
+            event_font = ImageFont.load_default()
+
         # Draw headers and vertical lines
         for i, day in enumerate(days):
             x0 = i * cell_width
             draw.rectangle([x0, 0, x0 + cell_width, header_height], fill=(80, 80, 160))
-            bbox = font.getbbox(day)
+            bbox = header_font.getbbox(day)
             w = bbox[2] - bbox[0]
             h = bbox[3] - bbox[1]
-            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=font)
+            draw.text((x0 + (cell_width - w)//2, (header_height - h)//2), day, fill="white", font=header_font)
             draw.line([(x0, 0), (x0, height)], fill=(100, 100, 100), width=2)
         draw.line([(width-1, 0), (width-1, height)], fill=(100, 100, 100), width=2)
         draw.line([(0, header_height), (width, header_height)], fill=(100, 100, 100), width=2)
@@ -46,9 +63,8 @@ class ScheduleFormatter:
                 text = event["title"]
                 if event["is_canceled"]:
                     text += " (Canceled)"
-                draw.text((x0 + padding, y0 + padding), text, fill="white", font=font)
+                draw.text((x0 + padding, y0 + padding), text, fill="white", font=event_font)
 
-        # Save image
         img.save(filename)
         return filename
 
