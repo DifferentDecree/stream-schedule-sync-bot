@@ -15,7 +15,7 @@ def run():
         Config.CHANNEL_ID,
         Config.MESSAGE_ID
     )
-    formatter = ScheduleFormatter(Config.TIMEZONE)
+    formatter = ScheduleFormatter(Config.TIME_ZONE)
 
     schedule = twitch. get_schedule()
     formatted = formatter.format_horizontal_grid(schedule)
