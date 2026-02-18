@@ -12,7 +12,7 @@ class ScheduleFormatter:
 
         #Build per-day lists
         week = {i: [] for i in range(7)}
-        for segment in data.get("data", {}).get("segments", [])
+        for segment in data.get("data", {}).get("segments", []):
             start_time_str = segment.get("start_time")
             title = segment.get("title", "Untitled")
             is_canceled = segment.get("is_canceled", False)
