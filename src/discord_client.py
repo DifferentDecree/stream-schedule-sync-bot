@@ -6,7 +6,7 @@ class DiscordClient:
         self.channel_id = channel_id
         self.message_id = message_id
 
-    def update_message(self_ content, ping_role=False, role_id="", embed_color=5814783):
+    def update_message(self_, content, ping_role=False, role_id="", embed_color=5814783):
         payload = {
             "content": f"<@&{role_id}>" if ping_role and role_id else "",
             "embeds": [{
