@@ -28,5 +28,5 @@ class TwitchClient:
             }
         )
         r.raise_for_status()
-        print r.json()
+        print (r.json())
         return r.json()
