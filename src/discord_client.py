@@ -6,7 +6,7 @@ class DiscordClient:
         self.channel_id = channel_id
         self.message_id = message_id
 
-     def update_image(self, image_path, content=""):
+    def update_image(self, image_path, content=""):
         """Update the existing message with a new image."""
         if not self.message_id:
             raise ValueError("MESSAGE_ID must be set to update a message.")
