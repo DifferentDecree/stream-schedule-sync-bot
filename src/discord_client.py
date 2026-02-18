@@ -6,22 +6,17 @@ class DiscordClient:
         self.channel_id = channel_id
         self.message_id = message_id
 
-    def update_message(self, content, ping_role=False, role_id="", embed_color=5814783):
-        payload = {
-            "content": f"<@&{role_id}>" if ping_role and role_id else "",
-            "embeds": [{
-                "title": "Weekly Stream Calendar",
-                "description": content,
-                "color": embed_color
-            }]
-        }
-        #Will need to review this API, likely need more in the body or URL is incorrect
-        r = requests.patch(
-            f"https://discord.com/api/v10/channels/{self.channel_id}/messages/{self.message_id}",
-            headers={
-                "Authorization": f"Bot {self.token}",
-                "Content-Type": "application/json"
-            },
-            json=payload
-        )
+     def update_image(self, image_path, content=""):
+        """Update the existing message with a new image."""
+        if not self.message_id:
+            raise ValueError("MESSAGE_ID must be set to update a message.")
+
+        with open(image_path, "rb") as f:
+            r = requests.patch(
+                f"https://discord.com/api/v10/channels/{self.channel_id}/messages/{self.message_id}",
+                headers={"Authorization": f"Bot {self.token}"},
+                files={"file": f},
+                data={"content": content}
+            )
         r.raise_for_status()
+        return r.json()
