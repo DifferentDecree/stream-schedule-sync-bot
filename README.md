@@ -40,7 +40,7 @@ Syncronizes your Twitch stream schedule to a **custom Discord calendar** embed a
 
 ### GitHub Actions Secrets
 
-Go to your repo -> **Settings -> Secrets -> Actions -> New repository secret**:
+Fork this repo -> Go to your repo -> **Settings -> Secrets -> Actions -> New repository secret**:
 
 - `DISCORD_TOKEN`
 - `CHANNEL_ID`
