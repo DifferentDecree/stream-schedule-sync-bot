@@ -1,16 +1,19 @@
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 import pytz
-import os 
+import os
+import textwrap  # for wrapping long text
 
 class ScheduleFormatter:
     def __init__(self, timezone="UTC"):
         self.tz = pytz.timezone(timezone)
 
+        # Font paths
         base_path = os.path.join(os.path.dirname(__file__), "assets", "fonts")
         self.header_font_path = os.path.join(base_path, "Roboto-Bold.ttf")
         self.event_font_path = os.path.join(base_path, "Roboto-Regular.ttf")
 
+        # Fallback if fonts not found
         if not os.path.exists(self.header_font_path):
             self.header_font_path = None
         if not os.path.exists(self.event_font_path):
@@ -23,7 +26,7 @@ class ScheduleFormatter:
         cell_width = 300
         cell_height = 120
         header_height = 80
-        padding = 15
+        padding = 10
 
         # Prepare week data
         week = self._prepare_data(data)
@@ -54,7 +57,7 @@ class ScheduleFormatter:
         draw.line([(width-1, 0), (width-1, height)], fill=(100, 100, 100), width=2)
         draw.line([(0, header_height), (width, header_height)], fill=(100, 100, 100), width=2)
 
-        # Draw events
+        # Draw events with wrapping
         for col, day_events in enumerate(week):
             x0 = col * cell_width
             for row, event in enumerate(day_events):
@@ -63,10 +66,35 @@ class ScheduleFormatter:
                 text = event["title"]
                 if event["is_canceled"]:
                     text += " (Canceled)"
-                draw.text((x0 + padding, y0 + padding), text, fill="white", font=event_font)
+
+                # Wrap text to fit cell width
+                max_width = cell_width - 2 * padding
+                wrapped_lines = self.wrap_text(text, event_font, max_width, draw)
+                for i, line in enumerate(wrapped_lines):
+                    line_y = y0 + padding + i * (event_font.size + 2)  # line spacing
+                    draw.text((x0 + padding, line_y), line, fill="white", font=event_font)
 
         img.save(filename)
         return filename
+
+    def wrap_text(self, text, font, max_width, draw):
+        """Wrap text to fit within max_width pixels"""
+        words = text.split()
+        lines = []
+        current_line = ""
+        for word in words:
+            test_line = f"{current_line} {word}".strip()
+            bbox = draw.textbbox((0,0), test_line, font=font)
+            w = bbox[2] - bbox[0]
+            if w <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+        return lines
 
     def _prepare_data(self, data):
         """
