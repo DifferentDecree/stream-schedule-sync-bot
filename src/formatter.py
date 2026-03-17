@@ -147,9 +147,13 @@ class ScheduleFormatter:
             tz_str = start.tzname()
             title = f"{time_str} {tz_str} {segment['title']}"
 
+            is_canceled = (
+            segment.get("canceled_until") is not None
+            )
+
             week[weekday].append({
                 "title": title,
-                "is_canceled": segment.get("is_canceled", False)
+                "is_canceled": is_canceled
             })
 
         return week
