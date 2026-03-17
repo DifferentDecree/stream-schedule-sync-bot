@@ -63,16 +63,45 @@ class ScheduleFormatter:
             for row, event in enumerate(day_events):
                 y0 = header_height + row * cell_height
                 draw.rectangle([x0, y0, x0 + cell_width, y0 + cell_height], outline=(100, 100, 100))
+
                 text = event["title"]
-                if event["is_canceled"]:
-                    text += " (Canceled)"
 
                 # Wrap text to fit cell width
                 max_width = cell_width - 2 * padding
                 wrapped_lines = self.wrap_text(text, event_font, max_width, draw)
+
+                line_offset = 0
+
+                if event["is_canceled"]:
+                    cancel_text = "CANCELED"
+                    cancel_bbox = draw.textbbox((0, 0), cancel_text, font=header_font)
+                    cancel_w = cancel_bbox[2] - cancel_bbox[0]
+
+                    cancel_x = x0 + (cell_width - cancel_w) // 2
+                    cancel_y = y0 + padding
+
+                    draw.text((cancel_x, cancel_y), cancel_text, fill=(255, 80, 80), font=header_font)
+
+                    line_offset = event_font.size + 10
+
+                # Draw wrapped lines
                 for i, line in enumerate(wrapped_lines):
-                    line_y = y0 + padding + i * (event_font.size + 2)  # line spacing
-                    draw.text((x0 + padding, line_y), line, fill="white", font=event_font)
+                    line_x = x0 + padding
+                    line_y = y0 + padding + line_offset + i * (event_font.size + 2)
+
+                    text_color = (255, 120, 120) if event["is_canceled"] else "white"
+
+                    draw.text((line_x, line_y), line, fill=text_color, font=event_font)
+
+                    if event["is_canceled"]:
+                        bbox = draw.textbbox((line_x, line_y), line, font=event_font)
+                        y_middle = (bbox[1] + bbox[3]) // 2
+
+                        draw.line(
+                            [(bbox[0], y_middle), (bbox[2], y_middle)],
+                            fill=(255, 80, 80),
+                            width=3
+                        )
 
         img.save(filename)
         return filename
@@ -117,9 +146,14 @@ class ScheduleFormatter:
             time_str = start.strftime("%I:%M %p").lstrip("0")
             tz_str = start.tzname()
             title = f"{time_str} {tz_str} {segment['title']}"
+
+            is_canceled = (
+            segment.get("canceled_until") is not None
+            )
+
             week[weekday].append({
                 "title": title,
-                "is_canceled": segment.get("is_canceled", False)
+                "is_canceled": is_canceled
             })
 
         return week
