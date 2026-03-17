@@ -27,5 +27,6 @@ class TwitchClient:
                 "Authorization": f"Bearer {self.token}"
             }
         )
+        print(r.json())
         r.raise_for_status()
         return r.json()
